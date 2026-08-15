@@ -1,0 +1,24 @@
+name: WorldReset
+version: '${project.version}'
+main: dev.versotech.worldreset.WorldResetPlugin
+api-version: '26.1'
+description: '${project.description}'
+authors: [Versotech]
+website: https://github.com/
+load: STARTUP
+folia-supported: false
+
+commands:
+  worldreset:
+    description: Administra o ciclo de reset do mundo.
+    usage: /worldreset <status|force|pregen|tp|reload>
+    aliases: [wr]
+    permission: worldreset.admin
+
+permissions:
+  worldreset.admin:
+    description: Acesso aos comandos administrativos do WorldReset.
+    default: op
+  worldreset.exempt:
+    description: A morte deste jogador NAO dispara o reset do mundo.
+    default: false

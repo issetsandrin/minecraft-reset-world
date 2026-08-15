@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>dev.versotech</groupId>
+    <artifactId>world-reset</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>WorldReset</name>
+    <description>Recria o mundo inteiro sempre que qualquer jogador online morre.</description>
+
+    <properties>
+        <!--
+            Alvo: 26.1.2, e nao a 26.2. O motivo e o EssentialsX: a ultima release
+            dele (2.22.0) declara suporte ate 26.1.2 e imprime "unsupported server
+            version" na 26.2. Como o servidor roda com EssentialsX, ficar na versao
+            que ele suporta vale mais do que estar no drop mais novo.
+
+            Paper 26.1.2 tambem e compilado para Java 25 (bytecode major 69).
+        -->
+        <java.version>25</java.version>
+        <paper.api.version>26.1.2.build.74-stable</paper.api.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.papermc.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <version>${paper.api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <defaultGoal>clean package</defaultGoal>
+        <finalName>${project.name}-${project.version}</finalName>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <release>${java.version}</release>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

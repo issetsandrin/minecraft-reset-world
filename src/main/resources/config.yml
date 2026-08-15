@@ -1,0 +1,109 @@
+# ---------------------------------------------------------------------------
+#  WorldReset - recria o mundo inteiro quando qualquer jogador online morre.
+# ---------------------------------------------------------------------------
+#  Como funciona: o mundo principal do servidor (level-name) e um LOBBY vazio
+#  e permanente, que nunca e apagado. O mundo jogavel ("arena") vive em dois
+#  slots que se alternam: enquanto o slot A esta em uso, o slot B ja foi criado
+#  e pre-gerado em background. Na morte, o servidor apenas troca o ponteiro de
+#  A para B - por isso o swap leva menos de um segundo.
+# ---------------------------------------------------------------------------
+
+lobby:
+  # Deve ser o mesmo valor de "level-name" no server.properties.
+  world-name: lobby
+  # Altura e raio da plataforma de barreira construida no spawn do lobby.
+  spawn-y: 100
+  platform-radius: 3
+
+arena:
+  # Nomes das pastas dos dois slots. O nether e o end sao derivados com os
+  # sufixos _nether e _the_end, que e a convencao que o Bukkit usa para ligar
+  # os portais entre dimensoes. Nao mude os sufixos.
+  slot-a: wr_arena_a
+  slot-b: wr_arena_b
+  # NORMAL, FLAT, LARGE_BIOMES ou AMPLIFIED
+  world-type: NORMAL
+  # PEACEFUL, EASY, NORMAL ou HARD
+  difficulty: NORMAL
+  generate-structures: true
+  # Cria tambem o nether e o end de cada slot. Desligue para economizar disco.
+  create-nether: true
+  create-the-end: true
+
+reset:
+  # Segundos de contagem regressiva entre a morte e o reset. O jogador morto
+  # ainda esta na tela de morte nesse intervalo; ele e respawnado a forca no
+  # final da contagem.
+  countdown-seconds: 5
+  # Intervalo minimo entre dois resets. Mortes dentro desse intervalo sao
+  # ignoradas - e a trava contra reset em cascata.
+  min-seconds-between-resets: 30
+  # Segundos de invulnerabilidade apos chegar no mundo novo. Protege contra o
+  # caso de o spawn seguro ainda assim ser fatal (queda de mob, afogamento).
+  grace-seconds: 10
+  # Anuncia no chat quem morreu e causou o reset.
+  announce-cause: true
+
+wipe:
+  inventory: true
+  ender-chest: true
+  experience: true
+  potion-effects: true
+  advancements: true
+  # Zerar estatisticas e caro (percorre todos os materiais e entidades por
+  # jogador). Desligue se notar travada no momento do reset.
+  statistics: true
+  recipes: true
+  # Apaga os arquivos .dat/.json dos jogadores que estao OFFLINE no momento do
+  # reset. Sem isso, quem nao estava online volta com o inventario da run
+  # anterior.
+  offline-players: true
+
+pregeneration:
+  enabled: true
+  # Raio em blocos ao redor do spawn do proximo mundo que sera gerado em
+  # background, antes de qualquer morte acontecer.
+  radius-blocks: 250
+  # Quantos chunks podem estar sendo gerados ao mesmo tempo. Subir demais
+  # aumenta o uso de memoria e o risco de lag.
+  max-concurrent-chunks: 8
+  # Quantas requisicoes de chunk sao despachadas por tick.
+  chunks-per-tick: 4
+  log-progress-every-percent: 10
+
+spawn-search:
+  # Nunca procure alem do raio pre-gerado, senao a busca gera chunk na thread
+  # principal e trava o servidor no pior momento possivel.
+  max-radius-blocks: 240
+  step: 8
+  min-air-above: 2
+  # Se nada seguro for encontrado, constroi uma plataforma de pedra. Isso
+  # garante que o jogador nunca nasce dentro de lava ou no void.
+  build-platform-as-fallback: true
+
+integrations:
+  essentials:
+    # auto = usa se o EssentialsX estiver instalado.
+    enabled: auto
+    # Remove homes, lastlocation e logoutlocation do userdata. Sao os dados que
+    # apontam para o mundo antigo e quebram /home e /back depois do reset.
+    # Saldo, nickname, kits e ignores sao preservados.
+    wipe-world-bound-data: true
+    # Reescreve o spawn.yml apontando para o spawn do mundo novo.
+    rewrite-spawn: true
+    # Executa "ess reload" depois de mexer nos arquivos, para o EssentialsX
+    # reler o disco em vez de sobrescrever com o cache em memoria.
+    reload-after-wipe: true
+
+messages:
+  prefix: '<gradient:#ff5555:#ffaa00><bold>WorldReset</bold></gradient> <dark_gray>| </dark_gray>'
+  death-triggered: '<red><player></red> <gray>morreu. O mundo sera recriado em <yellow><seconds></yellow> segundos.</gray>'
+  countdown-title: '<red><bold><seconds></bold></red>'
+  countdown-subtitle: '<gray>recriando o mundo...</gray>'
+  reset-started: '<gray>Preparando o novo mundo...</gray>'
+  reset-done: '<green>Mundo recriado.</green> <gray>Nova seed, invetario zerado. Boa sorte.</gray>'
+  grace-active: '<aqua>Voce esta invulneravel por <seconds> segundos.</aqua>'
+  cooldown-ignored: '<gray>Morte ignorada: um reset acabou de acontecer.</gray>'
+  pregen-started: '<gray>Pre-gerando o proximo mundo em background...</gray>'
+  pregen-done: '<green>Proximo mundo pronto</green> <gray>(<chunks> chunks).</gray>'
+  no-permission: '<red>Voce nao tem permissao para isso.</red>'

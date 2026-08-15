@@ -1,0 +1,11 @@
+# Tudo aqui é baixado pelo install.sh ou gerado pelo build.sh.
+# O repositório guarda só o código-fonte e os scripts.
+
+# JDK, paper-api e libs de compilação (~400 MB)
+/runtime/
+
+# Servidor: jars, mundos, configs geradas, logs
+/server/
+
+# Build do plugin
+/target/
