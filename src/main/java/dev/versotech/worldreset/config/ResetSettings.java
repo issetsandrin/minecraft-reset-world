@@ -49,7 +49,6 @@ public final class ResetSettings {
 
     private final long joinTeleportDelayTicks;
     private final int joinVerifyAttempts;
-    private final String lobbyPlatformMaterial;
 
     private final String essentialsMode;
     private final boolean essentialsWipeWorldBound;
@@ -59,7 +58,7 @@ public final class ResetSettings {
     public ResetSettings(FileConfiguration config) {
         this.lobbyWorldName = config.getString("lobby.world-name", "lobby");
         this.lobbySpawnY = config.getInt("lobby.spawn-y", 100);
-        this.lobbyPlatformRadius = Math.max(1, config.getInt("lobby.platform-radius", 3));
+        this.lobbyPlatformRadius = Math.max(3, config.getInt("lobby.platform-radius", 8));
 
         this.slotA = config.getString("arena.slot-a", "wr_arena_a");
         this.slotB = config.getString("arena.slot-b", "wr_arena_b");
@@ -96,7 +95,6 @@ public final class ResetSettings {
 
         this.joinTeleportDelayTicks = Math.max(1L, config.getLong("join.teleport-delay-ticks", 20L));
         this.joinVerifyAttempts = Math.max(1, config.getInt("join.verify-attempts", 3));
-        this.lobbyPlatformMaterial = config.getString("lobby.platform-material", "BEDROCK");
 
         this.essentialsMode = config.getString("integrations.essentials.enabled", "auto");
         this.essentialsWipeWorldBound = config.getBoolean("integrations.essentials.wipe-world-bound-data", true);
@@ -245,18 +243,6 @@ public final class ResetSettings {
 
     public int joinVerifyAttempts() {
         return joinVerifyAttempts;
-    }
-
-    /**
-     * Material da plataforma do lobby, resolvido com tolerancia a nome invalido:
-     * um typo no config nao pode resultar em lobby sem chao.
-     */
-    public org.bukkit.Material lobbyPlatformMaterial() {
-        org.bukkit.Material material = org.bukkit.Material.matchMaterial(lobbyPlatformMaterial);
-        if (material == null || !material.isBlock()) {
-            return org.bukkit.Material.BEDROCK;
-        }
-        return material;
     }
 
     public String essentialsMode() {

@@ -12,12 +12,16 @@ lobby:
   # Deve ser o mesmo valor de "level-name" no server.properties.
   world-name: lobby
   # Altura e raio da plataforma construida no spawn do lobby.
+  #
+  # O lobby e uma ilha circular de quartzo suspensa no vazio, com borda de sea
+  # lanterns, quatro pilares iluminados e uma bussola de pouso no centro, sob o
+  # ceu noturno. Uma parede invisivel na borda impede cair no void - uma morte
+  # ali dispararia um reset durante o proprio reset.
+  #
+  # Raio menor que 6 achata o desenho; muito maior desperdica blocos, ja que
+  # ninguem fica no lobby por mais que alguns segundos.
   spawn-y: 100
-  platform-radius: 3
-  # Bloco do chao do lobby. Precisa ser VISIVEL: com um bloco invisivel como
-  # BARRIER, quem passa pelo lobby ve o vazio e acha que o servidor quebrou.
-  # As bordas usam barreira invisivel de qualquer forma, para conter a queda.
-  platform-material: BEDROCK
+  platform-radius: 8
 
 join:
   # Ticks de espera antes de mover quem entra para o mundo ativo (20 = 1s).
