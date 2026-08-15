@@ -198,8 +198,7 @@ public final class HealthDisplayService implements Listener {
         if (total <= 0) {
             return Component.empty();
         }
-        return Component.text("  " + settings.iconDeaths() + " ", NamedTextColor.GRAY)
-                .append(Component.text(total, NamedTextColor.DARK_GRAY));
+        return stat(settings.iconDeaths(), total, NamedTextColor.DARK_GRAY);
     }
 
     static Component hearts(double ratio, TextColor color) {
@@ -217,21 +216,28 @@ public final class HealthDisplayService implements Listener {
     }
 
     /**
-     * Fome e armadura no formato "icone valor". O icone fica cinza para nao
-     * competir com os coracoes, que sao a informacao principal da linha.
+     * Fome e armadura. Sao numeros crus por padrao: o que os distingue e a cor,
+     * nao um rotulo. Um icone so aparece se estiver configurado.
      */
     private Component extras(Player player) {
         int armor = armorOf(player);
 
-        Component result = Component.text("  " + settings.iconHunger() + " ", NamedTextColor.GRAY)
-                .append(Component.text(player.getFoodLevel(), NamedTextColor.GOLD));
-
+        Component result = stat(settings.iconHunger(), player.getFoodLevel(), NamedTextColor.GOLD);
         if (armor > 0) {
-            result = result
-                    .append(Component.text("  " + settings.iconArmor() + " ", NamedTextColor.GRAY))
-                    .append(Component.text(armor, NamedTextColor.AQUA));
+            result = result.append(stat(settings.iconArmor(), armor, NamedTextColor.AQUA));
         }
         return result;
+    }
+
+    /**
+     * Monta um valor do painel. Com icone vazio nao sobra espaco pendurado, que
+     * e o que deixaria as colunas desalinhadas.
+     */
+    private static Component stat(String icon, int value, TextColor color) {
+        Component prefix = icon.isEmpty()
+                ? Component.text("  ")
+                : Component.text("  " + icon + " ", NamedTextColor.GRAY);
+        return prefix.append(Component.text(value, color));
     }
 
     private int armorOf(Player player) {

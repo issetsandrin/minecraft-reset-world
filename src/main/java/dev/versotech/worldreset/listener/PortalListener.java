@@ -6,6 +6,7 @@ import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityPortalEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.jetbrains.annotations.Nullable;
@@ -58,6 +59,35 @@ public final class PortalListener implements Listener {
         event.setSearchRadius(event.getCause() == TeleportCause.NETHER_PORTAL ? 128 : 0);
         event.setCanCreatePortal(event.getCause() == TeleportCause.NETHER_PORTAL);
         event.setCreationRadius(16);
+    }
+
+    /**
+     * Mesma ligacao para o que nao e jogador.
+     *
+     * <p>Itens jogados no portal, mobs empurrados e minecarts atravessam pelo
+     * EntityPortalEvent, que e outro caminho no servidor. Sem tratar aqui, tudo
+     * isso continuaria caindo no mundo errado.
+     */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onEntityPortal(EntityPortalEvent event) {
+        Location from = event.getFrom();
+        World origin = from.getWorld();
+        if (origin == null) {
+            return;
+        }
+
+        // O evento de entidade nao informa a causa; deduzimos pelo par que
+        // existir para este mundo.
+        TeleportCause cause = counterpart(origin, TeleportCause.NETHER_PORTAL) != null
+                ? TeleportCause.NETHER_PORTAL
+                : TeleportCause.END_PORTAL;
+
+        World destination = counterpart(origin, cause);
+        if (destination == null) {
+            return;
+        }
+        event.setTo(translate(from, destination, cause));
+        event.setSearchRadius(cause == TeleportCause.NETHER_PORTAL ? 128 : 0);
     }
 
     /** O mundo do outro lado do portal, ou null se nao houver par. */

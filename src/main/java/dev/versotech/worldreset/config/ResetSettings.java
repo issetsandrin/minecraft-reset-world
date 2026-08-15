@@ -110,9 +110,9 @@ public final class ResetSettings {
         this.healthDisplayShowHungerArmor = config.getBoolean("health-display.show-hunger-armor", true);
         this.healthDisplayHighlightDanger = config.getBoolean("health-display.highlight-danger", true);
         this.healthDisplayShowDeaths = config.getBoolean("health-display.show-deaths", true);
-        this.iconHunger = config.getString("health-display.icons.hunger", "\u2668");
-        this.iconArmor = config.getString("health-display.icons.armor", "\u26E8");
-        this.iconDeaths = config.getString("health-display.icons.deaths", "\u2620");
+        this.iconHunger = config.getString("health-display.icons.hunger", "");
+        this.iconArmor = config.getString("health-display.icons.armor", "");
+        this.iconDeaths = config.getString("health-display.icons.deaths", "");
 
         this.essentialsMode = config.getString("integrations.essentials.enabled", "auto");
         this.essentialsWipeWorldBound = config.getBoolean("integrations.essentials.wipe-world-bound-data", true);
