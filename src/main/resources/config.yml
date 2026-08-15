@@ -11,9 +11,25 @@
 lobby:
   # Deve ser o mesmo valor de "level-name" no server.properties.
   world-name: lobby
-  # Altura e raio da plataforma de barreira construida no spawn do lobby.
+  # Altura e raio da plataforma construida no spawn do lobby.
   spawn-y: 100
   platform-radius: 3
+  # Bloco do chao do lobby. Precisa ser VISIVEL: com um bloco invisivel como
+  # BARRIER, quem passa pelo lobby ve o vazio e acha que o servidor quebrou.
+  # As bordas usam barreira invisivel de qualquer forma, para conter a queda.
+  platform-material: BEDROCK
+
+join:
+  # Ticks de espera antes de mover quem entra para o mundo ativo (20 = 1s).
+  # Precisa ser suficiente para os plugins que tambem teleportam no join
+  # terminarem o que fazem.
+  teleport-delay-ticks: 20
+  # Quantas vezes reconferir se o jogador chegou mesmo ao mundo ativo.
+  #
+  # Nao e paranoia: o EssentialsX tem 'newbies.spawnpoint', que no PRIMEIRO
+  # acesso de cada jogador o manda para o spawn dele - normalmente o lobby - e
+  # faz isso depois de nos. Sem reconferir, todo jogador novo ficava preso la.
+  verify-attempts: 3
 
 arena:
   # Nomes das pastas dos dois slots. O nether e o end sao derivados com os

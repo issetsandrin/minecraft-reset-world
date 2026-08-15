@@ -47,6 +47,10 @@ public final class ResetSettings {
     private final int spawnSearchMinAirAbove;
     private final boolean spawnSearchBuildPlatform;
 
+    private final long joinTeleportDelayTicks;
+    private final int joinVerifyAttempts;
+    private final String lobbyPlatformMaterial;
+
     private final String essentialsMode;
     private final boolean essentialsWipeWorldBound;
     private final boolean essentialsRewriteSpawn;
@@ -89,6 +93,10 @@ public final class ResetSettings {
         this.spawnSearchStep = Math.max(1, config.getInt("spawn-search.step", 8));
         this.spawnSearchMinAirAbove = Math.max(2, config.getInt("spawn-search.min-air-above", 2));
         this.spawnSearchBuildPlatform = config.getBoolean("spawn-search.build-platform-as-fallback", true);
+
+        this.joinTeleportDelayTicks = Math.max(1L, config.getLong("join.teleport-delay-ticks", 20L));
+        this.joinVerifyAttempts = Math.max(1, config.getInt("join.verify-attempts", 3));
+        this.lobbyPlatformMaterial = config.getString("lobby.platform-material", "BEDROCK");
 
         this.essentialsMode = config.getString("integrations.essentials.enabled", "auto");
         this.essentialsWipeWorldBound = config.getBoolean("integrations.essentials.wipe-world-bound-data", true);
@@ -229,6 +237,26 @@ public final class ResetSettings {
 
     public boolean spawnSearchBuildPlatform() {
         return spawnSearchBuildPlatform;
+    }
+
+    public long joinTeleportDelayTicks() {
+        return joinTeleportDelayTicks;
+    }
+
+    public int joinVerifyAttempts() {
+        return joinVerifyAttempts;
+    }
+
+    /**
+     * Material da plataforma do lobby, resolvido com tolerancia a nome invalido:
+     * um typo no config nao pode resultar em lobby sem chao.
+     */
+    public org.bukkit.Material lobbyPlatformMaterial() {
+        org.bukkit.Material material = org.bukkit.Material.matchMaterial(lobbyPlatformMaterial);
+        if (material == null || !material.isBlock()) {
+            return org.bukkit.Material.BEDROCK;
+        }
+        return material;
     }
 
     public String essentialsMode() {

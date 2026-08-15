@@ -55,16 +55,39 @@ public final class GuardListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
+        ensureInActiveWorld(event.getPlayer(), settings.joinVerifyAttempts());
+    }
 
-        // Um tick de atraso deixa o EssentialsX aplicar o spawn-on-join dele
-        // primeiro; so entao decidimos o destino final.
-        Bukkit.getScheduler().runTask(plugin, () -> {
+    /**
+     * Leva o jogador ao mundo ativo e <em>reconfere</em> algumas vezes.
+     *
+     * <p>Um unico teleporte no join nao basta. O EssentialsX tem
+     * {@code newbies.spawnpoint}, que no primeiro acesso de cada jogador o
+     * manda para o spawn dele - e esse spawn, se nunca foi definido, e o do
+     * mundo principal, ou seja, o lobby. Como esse teleporte acontece depois do
+     * nosso, o jogador ficava presos no lobby exatamente na primeira entrada.
+     *
+     * <p>Reconferir resolve sem depender da configuracao de outro plugin: se
+     * algo puxou o jogador de volta, a proxima passagem o traz de novo.
+     */
+    private void ensureInActiveWorld(Player player, int attemptsLeft) {
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (!player.isOnline()) {
                 return;
             }
+
             if (coordinator.isRunning()) {
+                // Durante um reset o lobby e o lugar certo; o proprio reset
+                // move todo mundo para a arena nova quando terminar.
                 player.teleport(lifecycle.lobbySpawn());
+                return;
+            }
+
+            World active = Bukkit.getWorld(coordinator.slotState().active().overworld());
+            if (active == null) {
+                plugin.getLogger().severe("O mundo ativo '"
+                        + coordinator.slotState().active().overworld()
+                        + "' nao esta carregado; " + player.getName() + " ficara no lobby.");
                 return;
             }
 
@@ -75,9 +98,13 @@ public final class GuardListener implements Listener {
                     .allWorldNames().contains(current.getName());
 
             if (!inActiveSlot) {
-                player.teleport(activeSpawn());
+                player.teleport(active.getSpawnLocation());
             }
-        });
+
+            if (attemptsLeft > 1) {
+                ensureInActiveWorld(player, attemptsLeft - 1);
+            }
+        }, settings.joinTeleportDelayTicks());
     }
 
     // ------------------------------------------------------------ respawn

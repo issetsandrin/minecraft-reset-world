@@ -266,6 +266,26 @@ O EssentialsX 2.22.0 é instalado junto e é o motivo de o alvo ser 26.1.2: é a
 nova que ele declara suportar. Verificado nas duas — na 26.2 o boot imprime
 `You are running an unsupported server version!`; na 26.1.2 esse aviso não aparece.
 
+### Jogador novo ficava preso no lobby
+
+O EssentialsX tem `newbies.spawnpoint` no `config.yml` dele: no **primeiro acesso** de cada
+jogador, ele o teleporta para o spawn do Essentials — que, nunca tendo sido definido, é o
+do mundo principal, ou seja, o lobby. E faz isso *depois* do nosso teleporte. Resultado:
+todo jogador novo caía no mundo vazio e não saía mais.
+
+O plugin resolve sozinho, sem depender da configuração de terceiros: depois de entrar, ele
+reconfere algumas vezes se o jogador chegou mesmo ao mundo ativo (`join.verify-attempts`) e
+o traz de volta se algo o puxou.
+
+Se quiser eliminar a disputa na origem, edite `plugins/Essentials/config.yml`:
+
+```yaml
+newbies:
+  spawnpoint: none
+```
+
+### Dados presos ao mundo destruído
+
 A integração é detectada automaticamente. O EssentialsX guarda posições **com o nome do mundo** — e o
 mundo troca de nome a cada reset (A → B → A). Sem tratamento, depois do primeiro reset
 `/home` e `/back` apontam para um mundo apagado e o console enche de erro.

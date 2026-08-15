@@ -77,17 +77,39 @@ public final class WorldLifecycle {
     }
 
     /**
-     * Plataforma de barreira sob o spawn do lobby. Sem ela o jogador cai no void
-     * assim que entra, o que dispararia um reset dentro do proprio reset.
+     * Plataforma sob o spawn do lobby. Sem ela o jogador cai no void assim que
+     * entra, o que dispararia um reset dentro do proprio reset.
+     *
+     * <p>O chao usa um bloco <em>visivel</em> (bedrock por padrao). A primeira
+     * versao usava BARRIER, que e invisivel no jogo: quem caia no lobby via o
+     * vazio absoluto e concluia, com razao, que o servidor estava quebrado.
+     * As bordas continuam sendo barreiras invisiveis, para conter sem poluir a
+     * vista.
      */
     private void buildLobbyPlatform(World lobby) {
         int y = settings.lobbySpawnY();
         int radius = settings.lobbyPlatformRadius();
+        Material floor = settings.lobbyPlatformMaterial();
+
         for (int x = -radius; x <= radius; x++) {
             for (int z = -radius; z <= radius; z++) {
-                lobby.getBlockAt(x, y - 1, z).setType(Material.BARRIER, false);
+                lobby.getBlockAt(x, y - 1, z).setType(floor, false);
                 for (int dy = 0; dy < 3; dy++) {
                     lobby.getBlockAt(x, y + dy, z).setType(Material.AIR, false);
+                }
+            }
+        }
+
+        // Mureta invisivel na borda: evita cair do lobby por descuido durante o
+        // reset, que dispararia outro reset em cadeia.
+        for (int x = -radius - 1; x <= radius + 1; x++) {
+            for (int z = -radius - 1; z <= radius + 1; z++) {
+                boolean edge = Math.abs(x) == radius + 1 || Math.abs(z) == radius + 1;
+                if (!edge) {
+                    continue;
+                }
+                for (int dy = -1; dy < 3; dy++) {
+                    lobby.getBlockAt(x, y + dy, z).setType(Material.BARRIER, false);
                 }
             }
         }
