@@ -125,6 +125,25 @@ health-display:
   # Segunda linha por jogador com fome e armadura. Dobra o numero de linhas, e a
   # barra lateral so desenha 15 - com isto cabem 7 jogadores, sem isto 15.
   show-hunger-armor: true
+
+  # Icones do painel, no formato "icone valor".
+  #
+  # ATENCAO ao trocar: o Minecraft so desenha caracteres do BMP (ate U+FFFF).
+  # Emojis como a coxinha 🍗 ou o escudo 🛡 estao FORA dessa faixa e aparecem
+  # como quadradinho vazio no cliente vanilla. Para usar os icones reais do jogo
+  # seria preciso um resource pack instalado em cada jogador.
+  #
+  # Alternativas que funcionam: ☠ ☢ ✝ † (mortes), ⛨ ⚔ ✚ ⬟ (armadura),
+  # ♨ ☕ ⛾ ❖ (fome).
+  icons:
+    hunger: '♨'
+    armor: '⛨'
+    deaths: '☠'
+  # Mostra ao lado do nome quantas vezes o jogador ja morreu - ou seja, quantas
+  # vezes ja apagou o mundo de todos. A contagem e acumulada e sobrevive aos
+  # resets: fica em deaths.yml, fora do alcance do wipe que zera as estatisticas
+  # nativas do Minecraft. Para zerar o placar, apague esse arquivo.
+  show-deaths: true
   # Ordena os mais feridos no topo. Neste servidor a morte de qualquer um apaga
   # o mundo de todos, entao quem esta quase morrendo e a informacao urgente.
   highlight-danger: true

@@ -1,5 +1,6 @@
 package dev.versotech.worldreset.listener;
 
+import dev.versotech.worldreset.player.DeathCounter;
 import dev.versotech.worldreset.reset.ResetCoordinator;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -13,9 +14,11 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 public final class DeathListener implements Listener {
 
     private final ResetCoordinator coordinator;
+    private final DeathCounter deathCounter;
 
-    public DeathListener(ResetCoordinator coordinator) {
+    public DeathListener(ResetCoordinator coordinator, DeathCounter deathCounter) {
         this.coordinator = coordinator;
+        this.deathCounter = deathCounter;
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -28,6 +31,10 @@ public final class DeathListener implements Listener {
         event.setDroppedExp(0);
         event.setKeepInventory(false);
         event.setKeepLevel(false);
+
+        // A morte e contabilizada mesmo quando nao dispara reset - por cooldown ou
+        // por isencao. Quem morreu, morreu.
+        deathCounter.increment(player);
 
         if (player.hasPermission("worldreset.exempt")) {
             return;

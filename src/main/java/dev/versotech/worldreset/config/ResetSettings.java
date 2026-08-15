@@ -54,6 +54,10 @@ public final class ResetSettings {
     private final long healthDisplayUpdateTicks;
     private final boolean healthDisplayShowHungerArmor;
     private final boolean healthDisplayHighlightDanger;
+    private final boolean healthDisplayShowDeaths;
+    private final String iconHunger;
+    private final String iconArmor;
+    private final String iconDeaths;
 
     private final String essentialsMode;
     private final boolean essentialsWipeWorldBound;
@@ -105,6 +109,10 @@ public final class ResetSettings {
         this.healthDisplayUpdateTicks = Math.max(1L, config.getLong("health-display.update-ticks", 10L));
         this.healthDisplayShowHungerArmor = config.getBoolean("health-display.show-hunger-armor", true);
         this.healthDisplayHighlightDanger = config.getBoolean("health-display.highlight-danger", true);
+        this.healthDisplayShowDeaths = config.getBoolean("health-display.show-deaths", true);
+        this.iconHunger = config.getString("health-display.icons.hunger", "\u2668");
+        this.iconArmor = config.getString("health-display.icons.armor", "\u26E8");
+        this.iconDeaths = config.getString("health-display.icons.deaths", "\u2620");
 
         this.essentialsMode = config.getString("integrations.essentials.enabled", "auto");
         this.essentialsWipeWorldBound = config.getBoolean("integrations.essentials.wipe-world-bound-data", true);
@@ -269,6 +277,22 @@ public final class ResetSettings {
 
     public boolean healthDisplayHighlightDanger() {
         return healthDisplayHighlightDanger;
+    }
+
+    public boolean healthDisplayShowDeaths() {
+        return healthDisplayShowDeaths;
+    }
+
+    public String iconHunger() {
+        return iconHunger;
+    }
+
+    public String iconArmor() {
+        return iconArmor;
+    }
+
+    public String iconDeaths() {
+        return iconDeaths;
     }
 
     public String essentialsMode() {

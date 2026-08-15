@@ -1,6 +1,8 @@
 package dev.versotech.worldreset.display;
 
 import dev.versotech.worldreset.config.ResetSettings;
+import dev.versotech.worldreset.player.DeathCounter;
+import dev.versotech.worldreset.reset.ResetCoordinator;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -46,13 +48,20 @@ public final class HealthDisplayService implements Listener {
 
     private final JavaPlugin plugin;
     private final ResetSettings settings;
+    private final DeathCounter deathCounter;
+    private final ResetCoordinator coordinator;
     private final Map<UUID, HealthBoard> boards = new HashMap<>();
 
     private BukkitTask task;
 
-    public HealthDisplayService(JavaPlugin plugin, ResetSettings settings) {
+    public HealthDisplayService(JavaPlugin plugin,
+                                ResetSettings settings,
+                                DeathCounter deathCounter,
+                                ResetCoordinator coordinator) {
         this.plugin = plugin;
         this.settings = settings;
+        this.deathCounter = deathCounter;
+        this.coordinator = coordinator;
     }
 
     public void start() {
@@ -106,6 +115,7 @@ public final class HealthDisplayService implements Listener {
         if (!board.scoreboard().equals(viewer.getScoreboard())) {
             viewer.setScoreboard(board.scoreboard());
         }
+        board.title(title());
 
         List<Player> others = new ArrayList<>(online);
         others.remove(viewer);
@@ -119,8 +129,15 @@ public final class HealthDisplayService implements Listener {
         board.render(buildLines(others));
     }
 
+    /**
+     * Cabecalho com o numero do ciclo atual. Cada reset e uma tentativa nova, e
+     * ver "RESET #7" no canto deixa claro para todos quantas ja foram perdidas.
+     */
     private Component title() {
-        return Component.text(HEART_FULL + " VIDAS", NamedTextColor.RED);
+        return Component.text(HEART_FULL + " VIDAS", NamedTextColor.RED)
+                .append(Component.text("  ", NamedTextColor.DARK_GRAY))
+                .append(Component.text("RESET #" + (coordinator.slotState().resetCount() + 1),
+                        NamedTextColor.GOLD));
     }
 
     /**
@@ -150,13 +167,14 @@ public final class HealthDisplayService implements Listener {
             TextColor color = colorFor(ratio);
 
             if (showExtras) {
-                lines.add(Component.text(target.getName(), color));
+                lines.add(Component.text(target.getName(), color).append(deathTag(target)));
                 lines.add(Component.text(" ")
                         .append(hearts(ratio, color))
                         .append(extras(target)));
             } else {
                 lines.add(Component.text(target.getName() + " ", color)
-                        .append(hearts(ratio, color)));
+                        .append(hearts(ratio, color))
+                        .append(deathTag(target)));
             }
         }
 
@@ -166,6 +184,22 @@ public final class HealthDisplayService implements Listener {
             lines.add(Component.text("+ " + hidden + " sem espaco", NamedTextColor.DARK_GRAY));
         }
         return lines;
+    }
+
+    /**
+     * Quantas vezes este jogador ja apagou o mundo. Fica discreto de proposito:
+     * e um historico, nao um alarme como a vida baixa.
+     */
+    private Component deathTag(Player player) {
+        if (!settings.healthDisplayShowDeaths()) {
+            return Component.empty();
+        }
+        int total = deathCounter.count(player);
+        if (total <= 0) {
+            return Component.empty();
+        }
+        return Component.text("  " + settings.iconDeaths() + " ", NamedTextColor.GRAY)
+                .append(Component.text(total, NamedTextColor.DARK_GRAY));
     }
 
     static Component hearts(double ratio, TextColor color) {
@@ -182,16 +216,20 @@ public final class HealthDisplayService implements Listener {
                 .append(Component.text(empty.toString(), NamedTextColor.DARK_GRAY));
     }
 
-    /** Fome e armadura em numeros discretos, para nao competir com os coracoes. */
+    /**
+     * Fome e armadura no formato "icone valor". O icone fica cinza para nao
+     * competir com os coracoes, que sao a informacao principal da linha.
+     */
     private Component extras(Player player) {
-        int food = player.getFoodLevel();
         int armor = armorOf(player);
 
-        Component result = Component.text("  " + food, NamedTextColor.GOLD)
-                .append(Component.text(" fome", NamedTextColor.DARK_GRAY));
+        Component result = Component.text("  " + settings.iconHunger() + " ", NamedTextColor.GRAY)
+                .append(Component.text(player.getFoodLevel(), NamedTextColor.GOLD));
+
         if (armor > 0) {
-            result = result.append(Component.text("  " + armor, NamedTextColor.AQUA))
-                    .append(Component.text(" arm", NamedTextColor.DARK_GRAY));
+            result = result
+                    .append(Component.text("  " + settings.iconArmor() + " ", NamedTextColor.GRAY))
+                    .append(Component.text(armor, NamedTextColor.AQUA));
         }
         return result;
     }

@@ -7,6 +7,8 @@ import dev.versotech.worldreset.display.HealthDisplayService;
 import dev.versotech.worldreset.integration.EssentialsHook;
 import dev.versotech.worldreset.listener.DeathListener;
 import dev.versotech.worldreset.listener.GuardListener;
+import dev.versotech.worldreset.listener.PortalListener;
+import dev.versotech.worldreset.player.DeathCounter;
 import dev.versotech.worldreset.player.PlayerWiper;
 import dev.versotech.worldreset.reset.ResetCoordinator;
 import dev.versotech.worldreset.world.ChunkPregenerator;
@@ -46,6 +48,7 @@ public final class WorldResetPlugin extends JavaPlugin implements Listener {
     private WorldLifecycle lifecycle;
     private ChunkPregenerator pregenerator;
     private HealthDisplayService healthDisplay;
+    private DeathCounter deathCounter;
     private ResetCoordinator coordinator;
 
     @Override
@@ -128,9 +131,10 @@ public final class WorldResetPlugin extends JavaPlugin implements Listener {
     private void registerListeners() {
         var pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(this, this);
-        pluginManager.registerEvents(new DeathListener(coordinator), this);
+        pluginManager.registerEvents(new DeathListener(coordinator, deathCounter), this);
         pluginManager.registerEvents(new GuardListener(this, settings, coordinator, lifecycle), this);
         pluginManager.registerEvents(healthDisplay, this);
+        pluginManager.registerEvents(new PortalListener(), this);
     }
 
     @Override
@@ -144,6 +148,9 @@ public final class WorldResetPlugin extends JavaPlugin implements Listener {
         if (slotState != null) {
             slotState.save();
         }
+        if (deathCounter != null) {
+            deathCounter.save();
+        }
         Bukkit.getScheduler().cancelTasks(this);
     }
 
@@ -155,7 +162,10 @@ public final class WorldResetPlugin extends JavaPlugin implements Listener {
         this.slotState.load();
 
         this.lifecycle = new WorldLifecycle(this, settings);
-        this.healthDisplay = new HealthDisplayService(this, settings);
+
+        this.deathCounter = new DeathCounter(new File(getDataFolder(), "deaths.yml"), getLogger());
+        this.deathCounter.load();
+
         this.pregenerator = new ChunkPregenerator(this, settings);
 
         this.coordinator = new ResetCoordinator(
@@ -168,6 +178,8 @@ public final class WorldResetPlugin extends JavaPlugin implements Listener {
                 new SafeSpawnFinder(settings),
                 new PlayerWiper(this, settings),
                 new EssentialsHook(this, settings));
+
+        this.healthDisplay = new HealthDisplayService(this, settings, deathCounter, coordinator);
     }
 
     /**
@@ -210,6 +222,10 @@ public final class WorldResetPlugin extends JavaPlugin implements Listener {
 
     public Messages messages() {
         return messages;
+    }
+
+    public DeathCounter deathCounter() {
+        return deathCounter;
     }
 
     public HealthDisplayService healthDisplay() {

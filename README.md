@@ -243,9 +243,9 @@ Cada jogador vê, no canto superior direito, a vida de **todos os outros** em te
 
 ```
                               ❤ VIDAS
-                           Joao
+                           Joao        ☠5
                             ❤❤♡♡♡♡♡♡♡♡   3 fome
-                           Maria
+                           Maria       ☠1
                             ❤❤❤❤❤❤❤♡♡♡  18 fome  8 arm
                            Pedro
                             ❤❤❤❤❤❤❤❤❤❤  20 fome  5 arm
@@ -253,6 +253,17 @@ Cada jogador vê, no canto superior direito, a vida de **todos os outros** em te
 
 - **Corações mudam de cor** conforme o perigo: verde acima de 70%, amarelo acima de 30%,
   vermelho abaixo. Quem está vivo nunca aparece com zero corações, mesmo com 1 de vida.
+- **`☠` conta quantas vezes cada um já morreu** — ou seja, quantas vezes já apagou o mundo
+  de todos. Quem nunca morreu não exibe o marcador. A contagem é acumulada e vive em
+  `deaths.yml`, fora do alcance do wipe que zera as estatísticas nativas.
+- **O título mostra o ciclo atual** (`RESET #7`): quantas tentativas já foram perdidas.
+- Fome e armadura aparecem como `ícone valor`, com o ícone em cinza.
+
+> **Sobre os ícones:** o Minecraft só desenha caracteres do BMP (até U+FFFF). Emojis como a
+> coxinha 🍗 e o escudo 🛡 estão **fora** dessa faixa e viram quadradinho vazio no cliente
+> vanilla — usar os ícones reais do jogo exigiria um resource pack instalado por cada
+> jogador. Os três ícones são configuráveis em `health-display.icons`, então trocar leva
+> segundos se algum não ficar bom na sua fonte.
 - **Quem está ferido sobe para o topo.** Neste servidor a morte de qualquer um apaga o
   mundo de todos, então quem está prestes a morrer é a informação urgente, não um detalhe.
 - **Você não aparece na sua própria lista** — sua vida já está na HUD normal do jogo.
@@ -269,6 +280,22 @@ Ajustes em `health-display` no `config.yml`: `enabled`, `update-ticks`,
 Com `show-hunger-armor` ligado cada jogador ocupa duas linhas, e a barra lateral desenha no
 máximo 15 — cabem 7 jogadores. Desligando, cabem 15. Se alguém não couber, o painel diz
 quantos ficaram de fora em vez de omitir em silêncio.
+
+## Portais entre dimensões
+
+O Minecraft só liga automaticamente o overworld **principal** do servidor ao nether e ao end
+dele. Dimensões criadas por plugin ficam de fora dessa conta: ao voltar por um portal, o
+servidor não encontra o mundo de origem e deposita o jogador no ponto de nascimento — é por
+isso que existem plugins dedicados só a resolver isso.
+
+O `PortalListener` faz essa ligação pelo nome, nos dois sentidos:
+
+```
+wr_arena_a  ⇄  wr_arena_a_nether     (escala 8:1, como no vanilla)
+wr_arena_a  ⇄  wr_arena_a_the_end    (plataforma de obsidiana na ida)
+```
+
+Como a regra é por sufixo, vale para qualquer slot sem precisar saber qual está ativo.
 
 ## Comandos
 
