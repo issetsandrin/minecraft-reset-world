@@ -39,8 +39,15 @@ arena:
   slot-b: wr_arena_b
   # NORMAL, FLAT, LARGE_BIOMES ou AMPLIFIED
   world-type: NORMAL
-  # PEACEFUL, EASY, NORMAL ou HARD
-  difficulty: NORMAL
+  # PEACEFUL, EASY, NORMAL ou HARD.
+  #
+  # Este valor MANDA sobre o 'difficulty' do server.properties: o plugin cria os
+  # mundos da arena e aplica a dificuldade daqui em cada um deles. Mudar so o
+  # server.properties nao surte efeito nas arenas.
+  #
+  # O lobby fica sempre em PEACEFUL, independente disto - morrer la dispararia um
+  # reset dentro do proprio reset.
+  difficulty: HARD
   generate-structures: true
   # Cria tambem o nether e o end de cada slot. Desligue para economizar disco.
   create-nether: true
