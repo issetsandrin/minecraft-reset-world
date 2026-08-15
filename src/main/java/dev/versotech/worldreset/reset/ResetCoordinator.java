@@ -45,6 +45,15 @@ public final class ResetCoordinator {
     private long lastResetAt = 0L;
     private long graceUntil = 0L;
 
+    /**
+     * Ultimo spawn valido do mundo ativo.
+     *
+     * <p>Existe para ser lido de fora da thread principal: a escolha do ponto de
+     * entrada de quem conecta acontece num evento assincrono, e consultar o
+     * mundo de la seria pedir problema.
+     */
+    private volatile Location activeSpawnSnapshot;
+
     public ResetCoordinator(JavaPlugin plugin,
                             ResetSettings settings,
                             Messages messages,
@@ -168,6 +177,7 @@ public final class ResetCoordinator {
 
             Location spawn = spawnFinder.find(newWorld);
             newWorld.setSpawnLocation(spawn);
+            activeSpawnSnapshot = spawn;
 
             for (Player player : Bukkit.getOnlinePlayers()) {
                 wiper.wipe(player);
@@ -267,7 +277,18 @@ public final class ResetCoordinator {
         if (active == null) {
             return;
         }
-        active.setSpawnLocation(spawnFinder.find(active));
+        Location spawn = spawnFinder.find(active);
+        active.setSpawnLocation(spawn);
+        activeSpawnSnapshot = spawn;
+    }
+
+    /**
+     * Onde quem entra no servidor deve nascer, ou {@code null} se o mundo ativo
+     * ainda nao foi preparado. Seguro para leitura fora da thread principal.
+     */
+    public Location activeSpawnSnapshot() {
+        Location snapshot = activeSpawnSnapshot;
+        return snapshot == null ? null : snapshot.clone();
     }
 
     public ChunkPregenerator pregenerator() {

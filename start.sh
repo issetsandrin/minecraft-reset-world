@@ -9,7 +9,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 JAVA="$ROOT/runtime/jdk-25/bin/java"
 SERVER="$ROOT/server"
 
-MEMORY="${MEMORY:-2G}"
+MEMORY="${MEMORY:-6G}"
 
 if [[ ! -x "$JAVA" ]]; then
     echo "JDK 25 nao encontrado em $JAVA" >&2

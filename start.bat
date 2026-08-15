@@ -10,7 +10,7 @@ set "JAVA=%~dp0runtime\jdk-25\bin\java.exe"
 set "SERVER=%~dp0server"
 
 REM Heap do servidor. Para mudar: set MEMORY=4G antes de chamar este arquivo.
-if "%MEMORY%"=="" set "MEMORY=2G"
+if "%MEMORY%"=="" set "MEMORY=6G"
 
 if not exist "%JAVA%" (
     echo.

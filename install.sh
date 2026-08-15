@@ -8,7 +8,7 @@
 #
 # Uso:
 #   ./install.sh
-#   MEMORY=4G ./install.sh      # heap do servidor (padrão 2G)
+#   MEMORY=4G ./install.sh      # heap do servidor (padrão 6G)
 #
 set -euo pipefail
 
@@ -23,7 +23,7 @@ ESSENTIALS_VERSION="2.22.0"
 JDK_MAJOR="25"
 PLUGIN_VERSION="1.0.0"
 
-MEMORY="${MEMORY:-2G}"
+MEMORY="${MEMORY:-6G}"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RUNTIME="$ROOT/runtime"

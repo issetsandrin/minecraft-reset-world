@@ -137,9 +137,28 @@ E cada amigo precisa de:
 
 ### Limites
 
-O servidor só existe enquanto seu PC estiver ligado com as duas janelas abertas. O heap
-padrão é 2 GB (`MEMORY=4G start.bat` para subir). Se quiser algo no ar 24/7, o caminho é um
-VPS Linux — os scripts `.sh` deste repositório cobrem esse caso.
+O servidor só existe enquanto seu PC estiver ligado com as duas janelas abertas. Se quiser
+algo no ar 24/7, o caminho é um VPS Linux — os scripts `.sh` deste repositório cobrem esse
+caso.
+
+### Memória
+
+O heap padrão é **6 GB**, reservados na inicialização (`-Xms` e `-Xmx` iguais, com
+`AlwaysPreTouch`). Isso significa que o processo toma 6 GB de imediato, não conforme
+precisa.
+
+Só use esse valor se a máquina tiver folga real: **16 GB de RAM** é confortável, 8 GB fica
+apertado — o Windows e o próprio Minecraft do jogador também precisam de espaço. Numa
+máquina de 8 GB, prefira 4 GB.
+
+Para mudar sem editar arquivo, no `cmd`:
+
+```
+set MEMORY=4G
+start.bat
+```
+
+No Linux: `MEMORY=4G ./start.sh`.
 
 ## Instalação — Linux
 
@@ -167,7 +186,7 @@ editado **não** é sobrescrito.
 O primeiro boot baixa o jar da Mojang (~50 MB) e pré-gera o próximo mundo — leva alguns
 minutos. Do segundo em diante o servidor sobe em ~15s.
 
-Heap padrão 2 GB; para mudar: `MEMORY=4G ./start.sh`.
+Heap padrão **6 GB**; para mudar: `MEMORY=4G ./start.sh` (Linux) ou `set MEMORY=4G` antes do `start.bat` (Windows).
 
 ### Contas originais apenas
 
