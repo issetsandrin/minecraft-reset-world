@@ -230,16 +230,50 @@ function Build-Plugin {
     if (Test-Path $classes) { Remove-Item -Recurse -Force $classes }
     New-Item -ItemType Directory -Path $classes -Force | Out-Null
 
+    # ---------------------------------------------------------------------
+    #  Todas as opcoes vao para dentro do argfile, inclusive -cp e -d.
+    #
+    #  Motivo: se o caminho tiver espaco - e "C:\Users\Joao Silva\..." tem -
+    #  o javac quebra o argumento no espaco e reclama de "invalid flag". No
+    #  argfile cada valor fica entre aspas, o que resolve, e de quebra tira do
+    #  caminho o quoting do PowerShell para processos nativos, que e uma
+    #  segunda fonte do mesmo problema.
+    #
+    #  As barras invertidas viram barras normais porque, dentro de aspas no
+    #  argfile, o javac trata '\' como caractere de escape - "C:\Users" seria
+    #  lido errado. O Java aceita '/' como separador no Windows.
+    # ---------------------------------------------------------------------
+    function ConvertTo-ArgPath($path) { '"' + ($path -replace '\\', '/') + '"' }
+
     # No Windows o separador de classpath e ';', nao ':'
     $classpath = @(Join-Path $Runtime 'paper-api.jar')
     $classpath += (Get-ChildItem -Path (Join-Path $Runtime 'libs') -Filter '*.jar' | ForEach-Object { $_.FullName })
-    $classpathString = $classpath -join ';'
+    $classpathString = ($classpath | ForEach-Object { $_ -replace '\\', '/' }) -join ';'
 
+    $lines = @(
+        '-nowarn'
+        '-encoding UTF-8'
+        "-cp `"$classpathString`""
+        "-d $(ConvertTo-ArgPath $classes)"
+    )
+    $lines += Get-ChildItem -Path (Join-Path $Root 'src\main\java') -Filter '*.java' -Recurse |
+        ForEach-Object { ConvertTo-ArgPath $_.FullName }
+
+    # UTF-8 sem BOM: do Java 18 em diante o charset padrao e UTF-8 (JEP 400),
+    # e um BOM no inicio do argfile viraria lixo na primeira opcao.
+    # O cast para [string[]] e necessario: WriteAllLines nao aceita o Object[]
+    # que o PowerShell produz por padrao.
     $sourcesFile = Join-Path $build 'sources.txt'
-    $sources = Get-ChildItem -Path (Join-Path $Root 'src\main\java') -Filter '*.java' -Recurse | ForEach-Object { $_.FullName }
-    Set-Content -Path $sourcesFile -Value $sources -Encoding ASCII
+    [System.IO.File]::WriteAllLines($sourcesFile, [string[]]$lines, (New-Object System.Text.UTF8Encoding $false))
 
-    & $javac -nowarn -encoding UTF-8 -cp $classpathString -d $classes "@$sourcesFile"
+    # Entra na pasta do build para referenciar o argfile por nome relativo. Assim
+    # nem o proprio "@arquivo" precisa carregar um caminho com espaco.
+    Push-Location $build
+    try {
+        & $javac '@sources.txt'
+    } finally {
+        Pop-Location
+    }
     if ($LASTEXITCODE -ne 0) { Fail 'a compilacao falhou' }
 
     # Substitui os placeholders que o Maven normalmente resolveria.

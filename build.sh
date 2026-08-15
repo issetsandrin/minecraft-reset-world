@@ -22,7 +22,12 @@ done
 echo "Compilando..."
 rm -rf "$BUILD/classes"
 mkdir -p "$BUILD/classes"
-find "$ROOT/src/main/java" -name '*.java' > "$BUILD/sources.txt"
+
+# Cada caminho entre aspas: sem isso, uma pasta com espaco no nome faz o javac
+# quebrar o argumento no espaco e reclamar de "invalid flag".
+find "$ROOT/src/main/java" -name '*.java' -print0 \
+    | xargs -0 -I{} printf '"%s"\n' {} > "$BUILD/sources.txt"
+
 "$JAVAC" -nowarn -encoding UTF-8 -cp "$CLASSPATH" -d "$BUILD/classes" @"$BUILD/sources.txt"
 
 echo "Aplicando os placeholders dos resources..."
