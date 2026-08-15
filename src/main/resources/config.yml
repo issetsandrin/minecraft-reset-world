@@ -108,6 +108,27 @@ spawn-search:
   # garante que o jogador nunca nasce dentro de lava ou no void.
   build-platform-as-fallback: true
 
+health-display:
+  # Painel lateral com a vida de todos os jogadores.
+  #
+  # Fica no canto superior direito. O canto ESQUERDO nao e alcancavel por
+  # plugin: o Minecraft nao expoe HUD naquela area, so com resource pack ou mod
+  # instalado em cada cliente.
+  #
+  # Cada jogador ve os outros, nunca a si mesmo - a propria vida ja esta na
+  # barra da tela.
+  enabled: true
+  # Intervalo de atualizacao em ticks (20 = 1s). Valores baixos deixam o painel
+  # mais reativo e custam mais; 10 ticks e imperceptivel e meio segundo de
+  # defasagem nao muda nada.
+  update-ticks: 10
+  # Segunda linha por jogador com fome e armadura. Dobra o numero de linhas, e a
+  # barra lateral so desenha 15 - com isto cabem 7 jogadores, sem isto 15.
+  show-hunger-armor: true
+  # Ordena os mais feridos no topo. Neste servidor a morte de qualquer um apaga
+  # o mundo de todos, entao quem esta quase morrendo e a informacao urgente.
+  highlight-danger: true
+
 integrations:
   essentials:
     # auto = usa se o EssentialsX estiver instalado.

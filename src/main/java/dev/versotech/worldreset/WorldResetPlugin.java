@@ -3,6 +3,7 @@ package dev.versotech.worldreset;
 import dev.versotech.worldreset.command.WorldResetCommand;
 import dev.versotech.worldreset.config.Messages;
 import dev.versotech.worldreset.config.ResetSettings;
+import dev.versotech.worldreset.display.HealthDisplayService;
 import dev.versotech.worldreset.integration.EssentialsHook;
 import dev.versotech.worldreset.listener.DeathListener;
 import dev.versotech.worldreset.listener.GuardListener;
@@ -44,6 +45,7 @@ public final class WorldResetPlugin extends JavaPlugin implements Listener {
     private SlotState slotState;
     private WorldLifecycle lifecycle;
     private ChunkPregenerator pregenerator;
+    private HealthDisplayService healthDisplay;
     private ResetCoordinator coordinator;
 
     @Override
@@ -112,6 +114,7 @@ public final class WorldResetPlugin extends JavaPlugin implements Listener {
         // Aqui recreate=false de proposito - um slot de espera que sobreviveu ao
         // boot anterior ja esta limpo e possivelmente ja pre-gerado.
         Bukkit.getScheduler().runTask(this, () -> coordinator.prepareNextArena(false));
+        healthDisplay.start();
 
         // O layout de pastas mudou no Minecraft 26.x e e o que decide onde os
         // mundos sao apagados e onde estao os dados dos jogadores offline.
@@ -127,10 +130,14 @@ public final class WorldResetPlugin extends JavaPlugin implements Listener {
         pluginManager.registerEvents(this, this);
         pluginManager.registerEvents(new DeathListener(coordinator), this);
         pluginManager.registerEvents(new GuardListener(this, settings, coordinator, lifecycle), this);
+        pluginManager.registerEvents(healthDisplay, this);
     }
 
     @Override
     public void onDisable() {
+        if (healthDisplay != null) {
+            healthDisplay.stop();
+        }
         if (pregenerator != null) {
             pregenerator.cancel();
         }
@@ -148,6 +155,7 @@ public final class WorldResetPlugin extends JavaPlugin implements Listener {
         this.slotState.load();
 
         this.lifecycle = new WorldLifecycle(this, settings);
+        this.healthDisplay = new HealthDisplayService(this, settings);
         this.pregenerator = new ChunkPregenerator(this, settings);
 
         this.coordinator = new ResetCoordinator(
@@ -182,12 +190,18 @@ public final class WorldResetPlugin extends JavaPlugin implements Listener {
         if (pregenerator != null) {
             pregenerator.cancel();
         }
+        if (healthDisplay != null) {
+            healthDisplay.stop();
+        }
         // Cast explicito: a classe e Plugin e Listener ao mesmo tempo, e queremos
         // desregistrar tudo que o plugin registrou, nao so os handlers dele.
         HandlerList.unregisterAll((org.bukkit.plugin.Plugin) this);
         reloadConfig();
         buildComponents();
         registerListeners();
+        if (worldsReady.get()) {
+            healthDisplay.start();
+        }
     }
 
     public ResetSettings settings() {
@@ -196,6 +210,10 @@ public final class WorldResetPlugin extends JavaPlugin implements Listener {
 
     public Messages messages() {
         return messages;
+    }
+
+    public HealthDisplayService healthDisplay() {
+        return healthDisplay;
     }
 
     public ResetCoordinator coordinator() {

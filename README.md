@@ -237,6 +237,39 @@ mundo vanilla inútil a cada boot. O plugin avisa no console quando detecta isso
 
 ---
 
+## Painel de vida
+
+Cada jogador vê, no canto superior direito, a vida de **todos os outros** em tempo real:
+
+```
+                              ❤ VIDAS
+                           Joao
+                            ❤❤♡♡♡♡♡♡♡♡   3 fome
+                           Maria
+                            ❤❤❤❤❤❤❤♡♡♡  18 fome  8 arm
+                           Pedro
+                            ❤❤❤❤❤❤❤❤❤❤  20 fome  5 arm
+```
+
+- **Corações mudam de cor** conforme o perigo: verde acima de 70%, amarelo acima de 30%,
+  vermelho abaixo. Quem está vivo nunca aparece com zero corações, mesmo com 1 de vida.
+- **Quem está ferido sobe para o topo.** Neste servidor a morte de qualquer um apaga o
+  mundo de todos, então quem está prestes a morrer é a informação urgente, não um detalhe.
+- **Você não aparece na sua própria lista** — sua vida já está na HUD normal do jogo.
+- Atualiza a cada meio segundo, sem piscar: as linhas são times cujo prefixo é reescrito,
+  em vez de entradas removidas e readicionadas.
+
+Ajustes em `health-display` no `config.yml`: `enabled`, `update-ticks`,
+`show-hunger-armor` e `highlight-danger`.
+
+> **Sobre a posição:** o canto superior *esquerdo* não é alcançável por plugin — o
+> Minecraft não expõe HUD naquela área. Chegar lá exigiria um resource pack ou mod
+> instalado em cada cliente. A barra lateral é o equivalente nativo mais próximo.
+
+Com `show-hunger-armor` ligado cada jogador ocupa duas linhas, e a barra lateral desenha no
+máximo 15 — cabem 7 jogadores. Desligando, cabem 15. Se alguém não couber, o painel diz
+quantos ficaram de fora em vez de omitir em silêncio.
+
 ## Comandos
 
 | Comando | Efeito |

@@ -50,6 +50,11 @@ public final class ResetSettings {
     private final long joinTeleportDelayTicks;
     private final int joinVerifyAttempts;
 
+    private final boolean healthDisplayEnabled;
+    private final long healthDisplayUpdateTicks;
+    private final boolean healthDisplayShowHungerArmor;
+    private final boolean healthDisplayHighlightDanger;
+
     private final String essentialsMode;
     private final boolean essentialsWipeWorldBound;
     private final boolean essentialsRewriteSpawn;
@@ -95,6 +100,11 @@ public final class ResetSettings {
 
         this.joinTeleportDelayTicks = Math.max(1L, config.getLong("join.teleport-delay-ticks", 20L));
         this.joinVerifyAttempts = Math.max(1, config.getInt("join.verify-attempts", 3));
+
+        this.healthDisplayEnabled = config.getBoolean("health-display.enabled", true);
+        this.healthDisplayUpdateTicks = Math.max(1L, config.getLong("health-display.update-ticks", 10L));
+        this.healthDisplayShowHungerArmor = config.getBoolean("health-display.show-hunger-armor", true);
+        this.healthDisplayHighlightDanger = config.getBoolean("health-display.highlight-danger", true);
 
         this.essentialsMode = config.getString("integrations.essentials.enabled", "auto");
         this.essentialsWipeWorldBound = config.getBoolean("integrations.essentials.wipe-world-bound-data", true);
@@ -243,6 +253,22 @@ public final class ResetSettings {
 
     public int joinVerifyAttempts() {
         return joinVerifyAttempts;
+    }
+
+    public boolean healthDisplayEnabled() {
+        return healthDisplayEnabled;
+    }
+
+    public long healthDisplayUpdateTicks() {
+        return healthDisplayUpdateTicks;
+    }
+
+    public boolean healthDisplayShowHungerArmor() {
+        return healthDisplayShowHungerArmor;
+    }
+
+    public boolean healthDisplayHighlightDanger() {
+        return healthDisplayHighlightDanger;
     }
 
     public String essentialsMode() {
