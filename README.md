@@ -63,7 +63,29 @@ de arquivos nunca pode colidir com a criação de um mundo de mesmo nome.
 
 ---
 
-## Instalação
+## Instalação — Windows
+
+Baixe o repositório ([Code → Download ZIP](https://github.com/issetsandrin/minecraft-reset-world/archive/refs/heads/main.zip))
+e extraia numa pasta de caminho curto, por exemplo `C:\mcreset`.
+
+Depois, com **duplo clique**, nesta ordem:
+
+1. **`install.bat`** — baixa tudo e compila. Demora alguns minutos (~400 MB).
+2. **`start.bat`** — liga o servidor.
+
+Conecte o Minecraft **versão 26.1.2** em `localhost:25565`.
+
+> **Por que uma pasta de caminho curto?** O JDK tem arquivos com caminhos internos longos.
+> Numa pasta já profunda (`C:\Users\...\Downloads\...\minecraft-reset-world-main\`) o total
+> passa do limite de 260 caracteres do Windows e a extração falha no meio. O instalador
+> avisa quando detecta esse risco.
+
+Os `.bat` terminam com `pause`, então a janela **não fecha sozinha** — se algo falhar, a
+mensagem de erro fica na tela.
+
+Para recompilar depois de mexer no código: **`build.bat`**.
+
+## Instalação — Linux
 
 ```bash
 git clone git@github.com:issetsandrin/minecraft-reset-world.git
@@ -71,8 +93,6 @@ cd minecraft-reset-world
 ./install.sh
 ./start.sh
 ```
-
-Só isso. Conecte em `localhost:25565`.
 
 O `install.sh` não pede nada instalado além de `curl`, `tar`, `unzip` e `python3` — nem
 Java, nem Maven. Ele baixa e monta:
@@ -288,8 +308,14 @@ caminhos são tratados.
 
 ## O que foi testado
 
-Validado em servidor real — primeiro na 26.2, depois na **26.1.2**, que é o alvo final.
-Quatro resets completos no total:
+> **Os scripts Windows (`.bat` / `.ps1`) não foram executados em Windows.** Foram escritos
+> a partir do que os scripts Linux — esses sim, testados de ponta a ponta — fazem, com a
+> URL e a estrutura interna do JDK Windows verificadas. O plugin em si é idêntico nos dois
+> sistemas: o que muda é só o instalador. Se algo falhar no Windows, a mensagem aparece na
+> janela (os `.bat` têm `pause`) e é rápido de corrigir.
+
+Validado em servidor real (Linux) — primeiro na 26.2, depois na **26.1.2**, que é o alvo
+final. Quatro resets completos no total:
 
 - Plugin carrega e habilita; lobby nasce void com plataforma de barrier confirmada por
   sonda de bloco (`y=64` é ar, `y=99` é barrier)

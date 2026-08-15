@@ -1,0 +1,12 @@
+# Sem isto, um clone no Windows pode entregar .bat com fim de linha LF, e o
+# interpretador de batch se perde em construcoes de multiplas linhas.
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Os scripts de Linux precisam de LF mesmo quando clonados no Windows.
+*.sh  text eol=lf
+
+*.java text
+*.yml  text
+*.xml  text
+*.md   text
