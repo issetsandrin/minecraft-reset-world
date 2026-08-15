@@ -26,6 +26,13 @@ public final class SlotState {
     private boolean standbyReady = false;
     private int resetCount = 0;
 
+    /** Tempo de sobrevivencia da run atual e o melhor ja alcancado. */
+    private long survivalMillis = 0L;
+    private long bestSurvivalMillis = 0L;
+
+    /** Instante do ultimo tick contabilizado; nao persiste. */
+    private long lastTick = 0L;
+
     public SlotState(File file, ResetSettings settings, Logger logger) {
         this.file = file;
         this.settings = settings;
@@ -41,6 +48,8 @@ public final class SlotState {
         this.activeSlot = SLOT_B.equalsIgnoreCase(slot) ? SLOT_B : SLOT_A;
         this.standbyReady = yaml.getBoolean("standby-ready", false);
         this.resetCount = yaml.getInt("reset-count", 0);
+        this.survivalMillis = yaml.getLong("survival-millis", 0L);
+        this.bestSurvivalMillis = yaml.getLong("best-survival-millis", 0L);
     }
 
     public void save() {
@@ -48,6 +57,8 @@ public final class SlotState {
         yaml.set("active-slot", activeSlot);
         yaml.set("standby-ready", standbyReady);
         yaml.set("reset-count", resetCount);
+        yaml.set("survival-millis", survivalMillis);
+        yaml.set("best-survival-millis", bestSurvivalMillis);
         try {
             yaml.save(file);
         } catch (IOException e) {
@@ -61,6 +72,53 @@ public final class SlotState {
 
     public Arena standby() {
         return new Arena(SLOT_A.equals(activeSlot) ? settings.slotB() : settings.slotA());
+    }
+
+    // ------------------------------------------------- cronometro da run
+
+    /**
+     * Acumula o tempo decorrido desde a chamada anterior.
+     *
+     * <p>So conta com alguem conectado. Um servidor ligado a noite inteira sem
+     * ninguem jogando nao deveria inflar o tempo de sobrevivencia, e tampouco as
+     * horas em que ele fica desligado - por isso o acumulado e somado em fatias
+     * em vez de calculado a partir de um instante inicial.
+     */
+    public void tickSurvival(boolean anyoneOnline, long nowMillis) {
+        if (lastTick != 0L && anyoneOnline) {
+            survivalMillis += nowMillis - lastTick;
+        }
+        lastTick = nowMillis;
+    }
+
+    public long survivalMillis() {
+        return survivalMillis;
+    }
+
+    public long bestSurvivalMillis() {
+        return bestSurvivalMillis;
+    }
+
+    /**
+     * Encerra a run atual e devolve quanto ela durou, promovendo o resultado a
+     * recorde se for o caso.
+     *
+     * @return duracao da run e se ela bateu o recorde anterior
+     */
+    public RunResult finishRun() {
+        long survived = survivalMillis;
+        boolean record = survived > bestSurvivalMillis;
+        if (record) {
+            bestSurvivalMillis = survived;
+        }
+        survivalMillis = 0L;
+        lastTick = 0L;
+        save();
+        return new RunResult(survived, record);
+    }
+
+    /** Quanto durou uma run e se ela superou todas as anteriores. */
+    public record RunResult(long millis, boolean record) {
     }
 
     /** Promove o standby a ativo. Chamado no instante do swap. */

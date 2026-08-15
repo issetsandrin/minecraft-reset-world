@@ -121,12 +121,37 @@ public final class HealthDisplayService implements Listener {
         others.remove(viewer);
 
         if (others.isEmpty()) {
-            board.render(List.of(Component.text("ninguem mais online", NamedTextColor.DARK_GRAY)));
+            List<Component> lines = new ArrayList<>(clockLines());
+            lines.add(Component.text("ninguem mais online", NamedTextColor.DARK_GRAY));
+            board.render(lines);
             return;
         }
 
         sort(others);
-        board.render(buildLines(others));
+
+        List<Component> lines = new ArrayList<>(clockLines());
+        lines.addAll(buildLines(others));
+        board.render(lines);
+    }
+
+    /**
+     * Tempo de sobrevivencia da run atual e o recorde, quando existir.
+     *
+     * <p>Fica no topo por ser a informacao da rodada inteira, nao de um jogador.
+     */
+    private List<Component> clockLines() {
+        var state = coordinator.slotState();
+        List<Component> lines = new ArrayList<>(2);
+
+        lines.add(Component.text(Duration.format(state.survivalMillis()), NamedTextColor.WHITE)
+                .append(Component.text(" de pe", NamedTextColor.DARK_GRAY)));
+
+        long best = state.bestSurvivalMillis();
+        if (best > 0) {
+            lines.add(Component.text("recorde ", NamedTextColor.DARK_GRAY)
+                    .append(Component.text(Duration.format(best), NamedTextColor.GRAY)));
+        }
+        return lines;
     }
 
     /**

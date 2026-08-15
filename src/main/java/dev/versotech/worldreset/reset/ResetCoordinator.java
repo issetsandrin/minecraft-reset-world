@@ -2,6 +2,7 @@ package dev.versotech.worldreset.reset;
 
 import dev.versotech.worldreset.config.Messages;
 import dev.versotech.worldreset.config.ResetSettings;
+import dev.versotech.worldreset.display.Duration;
 import dev.versotech.worldreset.integration.EssentialsHook;
 import dev.versotech.worldreset.player.PlayerWiper;
 import dev.versotech.worldreset.world.Arena;
@@ -119,10 +120,16 @@ public final class ResetCoordinator {
             return;
         }
 
+        // O cronometro para aqui, e nao no fim da contagem regressiva: o que
+        // interessa e quanto tempo o mundo durou ate a morte.
+        var run = slotState.finishRun();
+
         int seconds = settings.countdownSeconds();
         if (settings.announceCause()) {
             Bukkit.broadcast(messages.chat("death-triggered", "player", cause, "seconds", seconds));
         }
+        Bukkit.broadcast(messages.chat(run.record() ? "survival-record" : "survival-time",
+                "time", Duration.format(run.millis())));
 
         if (seconds <= 0) {
             performSwap();

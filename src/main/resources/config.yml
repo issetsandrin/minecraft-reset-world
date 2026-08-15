@@ -169,6 +169,8 @@ messages:
   death-triggered: '<red><player></red> <gray>morreu. O mundo sera recriado em <yellow><seconds></yellow> segundos.</gray>'
   countdown-title: '<red><bold><seconds></bold></red>'
   countdown-subtitle: '<gray>recriando o mundo...</gray>'
+  survival-time: '<gray>O mundo durou</gray> <white><time></white><gray>.</gray>'
+  survival-record: '<gold>NOVO RECORDE:</gold> <white><time></white> <gray>de pe.</gray>'
   reset-started: '<gray>Preparando o novo mundo...</gray>'
   reset-done: '<green>Mundo recriado.</green> <gray>Nova seed, invetario zerado. Boa sorte.</gray>'
   grace-active: '<aqua>Voce esta invulneravel por <seconds> segundos.</aqua>'

@@ -242,8 +242,10 @@ mundo vanilla inútil a cada boot. O plugin avisa no console quando detecta isso
 Cada jogador vê, no canto superior direito, a vida de **todos os outros** em tempo real:
 
 ```
-                              ❤ VIDAS
-                           Joao        ☠5
+                           ❤ VIDAS   RESET #3
+                           12:34 de pe
+                           recorde 45:12
+                           Joao        5
                             ❤❤♡♡♡♡♡♡♡♡   3 fome
                            Maria       ☠1
                             ❤❤❤❤❤❤❤♡♡♡  18 fome  8 arm
@@ -257,6 +259,9 @@ Cada jogador vê, no canto superior direito, a vida de **todos os outros** em te
   de todos. Quem nunca morreu não exibe o marcador. A contagem é acumulada e vive em
   `deaths.yml`, fora do alcance do wipe que zera as estatísticas nativas.
 - **O título mostra o ciclo atual** (`RESET #7`): quantas tentativas já foram perdidas.
+- **O cronômetro** conta desde a chegada ao mundo novo até a morte que o destrói, e o
+  recorde fica logo abaixo. Ele só corre **enquanto há alguém conectado** — servidor ligado
+  sozinho de madrugada não infla o tempo, nem as horas em que fica desligado.
 - Fome e armadura aparecem como `ícone valor`, com o ícone em cinza.
 
 > **Sobre os ícones:** o Minecraft só desenha caracteres do BMP (até U+FFFF). Emojis como a

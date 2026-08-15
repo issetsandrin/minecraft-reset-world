@@ -119,6 +119,12 @@ public final class WorldResetPlugin extends JavaPlugin implements Listener {
         Bukkit.getScheduler().runTask(this, () -> coordinator.prepareNextArena(false));
         healthDisplay.start();
 
+        // Contabiliza o tempo de sobrevivencia em fatias de um segundo, somando
+        // apenas quando ha alguem conectado.
+        Bukkit.getScheduler().runTaskTimer(this, () ->
+                slotState.tickSurvival(!Bukkit.getOnlinePlayers().isEmpty(),
+                        System.currentTimeMillis()), 20L, 20L);
+
         // O layout de pastas mudou no Minecraft 26.x e e o que decide onde os
         // mundos sao apagados e onde estao os dados dos jogadores offline.
         // Registrar o que foi resolvido evita depurar isso as cegas depois.
