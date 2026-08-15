@@ -3,6 +3,7 @@ package dev.versotech.worldreset.listener;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -52,7 +53,7 @@ public final class PortalListener implements Listener {
             return;
         }
 
-        event.setTo(translate(from, destination, event.getCause()));
+        event.setTo(translate(from, destination, event.getCause(), event.getPlayer()));
 
         // Sem isto o servidor usa o raio configurado para o mundo principal, que
         // nao vale para dimensoes de plugin.
@@ -86,7 +87,7 @@ public final class PortalListener implements Listener {
         if (destination == null) {
             return;
         }
-        event.setTo(translate(from, destination, cause));
+        event.setTo(translate(from, destination, cause, null));
         event.setSearchRadius(cause == TeleportCause.NETHER_PORTAL ? 128 : 0);
     }
 
@@ -117,11 +118,25 @@ public final class PortalListener implements Listener {
      * <p>Entre overworld e nether a escala e de oito para um, que e o que faz um
      * portal reaparecer perto de onde deveria em vez de a quilometros dali.
      */
-    private Location translate(Location from, World destination, TeleportCause cause) {
+    private Location translate(Location from, World destination, TeleportCause cause,
+                               @Nullable Player player) {
         if (cause == TeleportCause.END_PORTAL) {
-            return destination.getEnvironment() == World.Environment.THE_END
-                    ? new Location(destination, END_PLATFORM_X, END_PLATFORM_Y, END_PLATFORM_Z)
-                    : destination.getSpawnLocation();
+            if (destination.getEnvironment() == World.Environment.THE_END) {
+                // Ida: o vanilla materializa quem chega sobre a plataforma de
+                // obsidiana, nunca nas coordenadas de origem.
+                return new Location(destination, END_PLATFORM_X, END_PLATFORM_Y, END_PLATFORM_Z);
+            }
+
+            // Volta: o end nao e simetrico ao nether. Nao existe portal de
+            // retorno numa posicao equivalente - o vanilla devolve o jogador ao
+            // ponto de renascimento dele, que e a cama se houver uma.
+            if (player != null) {
+                Location respawn = player.getRespawnLocation();
+                if (respawn != null && destination.equals(respawn.getWorld())) {
+                    return respawn;
+                }
+            }
+            return destination.getSpawnLocation();
         }
 
         double scale = from.getWorld().getEnvironment() == World.Environment.NETHER
