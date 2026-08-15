@@ -85,6 +85,62 @@ mensagem de erro fica na tela.
 
 Para recompilar depois de mexer no código: **`build.bat`**.
 
+## Abrir para os amigos jogarem
+
+O servidor roda no seu PC; o `playit.gg` cria um endereço público que aponta para ele, sem
+mexer no roteador — o que também contorna CGNAT, comum em fibra no Brasil.
+
+### 1. Whitelist primeiro
+
+Faça isto **antes** de expor o servidor. Na janela do servidor (`start.bat`), nesta ordem:
+
+```
+whitelist add SeuNick
+whitelist add NickDoAmigo
+whitelist on
+```
+
+> **A ordem importa.** Se você ligar a whitelist antes de se adicionar, você mesmo fica de
+> fora e vai precisar voltar ao console para entrar.
+
+Um servidor exposto recebe varredura de bot em questão de horas. Sem whitelist, qualquer
+estranho entra — e como **o mundo inteiro é apagado quando alguém morre**, basta um
+desconhecido morrer de propósito para zerar o progresso de todos.
+
+Para adicionar mais gente depois: `whitelist add <nick>`. Para ver a lista:
+`whitelist list`.
+
+### 2. Túnel do playit.gg
+
+1. Crie uma conta em [playit.gg](https://playit.gg).
+2. Baixe o agente para Windows e execute.
+3. O programa mostra um **link de ativação** — abra no navegador, faça login e confirme o
+   agente.
+4. Em [playit.gg/account/tunnels](https://playit.gg/account/tunnels), clique em **Add
+   Tunnel** e escolha **Minecraft Java**. O endereço local já vem preenchido como
+   `127.0.0.1:25565`, que é exatamente onde este servidor escuta.
+5. O painel mostra um domínio parecido com `algo.gl.at.ply.gg`. **É esse endereço que seus
+   amigos usam** no Minecraft.
+
+### 3. Para jogar
+
+Precisam estar rodando ao mesmo tempo:
+
+- o servidor (`start.bat`);
+- o agente do playit.gg.
+
+E cada amigo precisa de:
+
+- conta **original** da Mojang/Microsoft (`online-mode=true`);
+- Minecraft na versão **26.1.2**;
+- estar na whitelist.
+
+### Limites
+
+O servidor só existe enquanto seu PC estiver ligado com as duas janelas abertas. O heap
+padrão é 2 GB (`MEMORY=4G start.bat` para subir). Se quiser algo no ar 24/7, o caminho é um
+VPS Linux — os scripts `.sh` deste repositório cobrem esse caso.
+
 ## Instalação — Linux
 
 ```bash
